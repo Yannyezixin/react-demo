@@ -16,7 +16,20 @@ var Comment = React.createClass({
     }
 });
 
+var SetIntervalMixin = {
+    componentWillMount: function() {
+        this.intervals = [];
+    },
+    setInterval: function() {
+        this.intervals.push(setInterval.apply(null, arguments));
+    },
+    componentWillUnmount: function() {
+        this.intervals.map(clearInterval);
+    }
+};
+
 var CommentBox = React.createClass({
+    mixins: [SetIntervalMixin],
     getInitialState: function() {
         return {data: []};
     },
@@ -52,7 +65,7 @@ var CommentBox = React.createClass({
     },
     componentDidMount: function() {
         this.loadCommentsFromServer();
-        setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+        this.setInterval(this.loadCommentsFromServer, this.props.pollInterval);
     },
     render: function() {
         return (
